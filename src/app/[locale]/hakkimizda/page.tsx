@@ -38,7 +38,7 @@ export default function HakkimizdaPage({ params }: Props) {
   }
 
   return (
-    <main className="pt-28 pb-16">
+    <main className="pt-40 pb-16">
       <Container>
         {/* Başlık Bölümü */}
         <div className="mb-12 text-center">
