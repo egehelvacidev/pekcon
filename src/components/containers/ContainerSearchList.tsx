@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Locale } from '@/lib/i18n';
 import { FiSearch, FiFilter, FiBox, FiMaximize2, FiX } from 'react-icons/fi';
@@ -61,7 +61,8 @@ interface ContainerSearchListProps {
 }
 
 export default function ContainerSearchList({ locale }: ContainerSearchListProps) {
-  const containerTypes: ContainerType[] = [
+  // containerTypes dizisini useMemo ile sarmalıyoruz
+  const containerTypes = useMemo<ContainerType[]>(() => [
     { id: '1', name: '20\' Dry Konteyner', slug: '20-dry-konteyner', category: 'dry', size: '20' },
     { id: '2', name: '40\' Dry Konteyner', slug: '40-dry-konteyner', category: 'dry', size: '40' },
     { id: '3', name: '40\' High Cube Konteyner', slug: '40-high-cube-konteyner', category: 'high-cube', size: '40' },
@@ -87,7 +88,7 @@ export default function ContainerSearchList({ locale }: ContainerSearchListProps
     { id: '23', name: '40\' HC Open Side Konteyner', slug: '40-hc-open-side-konteyner', category: 'open-side', size: '40' },
     { id: '24', name: '20\' DV Bulk Konteyner', slug: '20-dv-bulk-konteyner', category: 'other', size: '20' },
     { id: '25', name: 'Yaşam Konteyneri', slug: 'yasam-konteyneri', category: 'other', size: 'all' },
-  ];
+  ], []);
   
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');

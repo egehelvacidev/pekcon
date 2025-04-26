@@ -5,21 +5,30 @@ import Button from '@/components/ui/Button';
 import Container from '@/components/ui/Container';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n';
-import { Locale } from '@/lib/i18n';
 import { notFound } from 'next/navigation';
 
-export function generateMetadata({ params }: { params: { locale: string } }): Metadata {
+type Params = {
+  locale: string;
+};
+
+type Props = {
+  params: Params;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const locale = params.locale;
+  
   return {
-    title: params.locale === 'tr' ? 'Hakkımızda | PEKCON KONTEYNER' : 'About Us | PEKCON CONTAINER',
+    title: locale === 'tr' ? 'Hakkımızda | PEKCON KONTEYNER' : 'About Us | PEKCON CONTAINER',
     description:
-      params.locale === 'tr'
+      locale === 'tr'
         ? 'PEKCON KONTEYNER hakkında bilgi edinin. Konteyner taşımacılığı ve lojistik çözüm ortağınız.'
         : 'Learn about PEKCON CONTAINER. Your container shipping and logistics solution partner.',
   };
 }
 
-export default function HakkimizdaPage({ params }: { params: { locale: string } }) {
-  const locale = params.locale as Locale;
+export default function HakkimizdaPage({ params }: Props) {
+  const locale = params.locale;
   const t = useTranslations('about');
   const actionT = useTranslations('actions');
   
