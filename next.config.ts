@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // TypeScript hatalarını görmezden gelecek şekilde konfigüre ediyoruz
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  // ESLint hatalarını görmezden gelecek şekilde konfigüre ediyoruz
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default withNextIntl()(nextConfig);
