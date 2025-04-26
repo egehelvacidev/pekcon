@@ -69,6 +69,13 @@ export default function AboutUs({ params }: Props) {
                 className="object-cover" 
                 sizes="(max-width: 768px) 100vw, 50vw"
                 priority
+                onError={(e) => {
+                  // Hata durumunda alternatif kaynağı kullan
+                  const target = e.target as HTMLImageElement;
+                  target.src = "https://lojistikcdn.vercel.app/images/hero/containergif.gif";
+                  // Veya yedek bir statik resim:
+                  // target.src = "/images/hero/container-static.jpg";
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-black/30"></div>
             </div>

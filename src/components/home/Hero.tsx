@@ -53,9 +53,10 @@ export default function Hero({ locale }: HeroProps) {
           muted
           loop
           playsInline
-          poster="/images/hero-bg-poster.jpg" /* Fallback poster image for mobile */
+          poster="/images/hero/video-thumbnail.jpg"
         >
           <source src="/videos/herovideo.mp4" type="video/mp4" />
+          <source src="https://lojistikcdn.vercel.app/videos/herovideo.mp4" type="video/mp4" />
         </video>
         
         {/* Video üzerinde gradient overlay */}
