@@ -36,7 +36,7 @@ export default function Services({ params }: { params: { locale: Locale } }) {
   }
   
   return (
-    <main className="pt-40 pb-20">
+    <main className="pt-40 pb-20 bg-white">
       <Container>
         <div className="mb-12">
           <h1 className="text-3xl font-bold mb-4">Hizmetlerimiz</h1>

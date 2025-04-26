@@ -125,7 +125,7 @@ export default function ServiceDetailPage({ params }: Props) {
   console.log(`ServiceDetailPage - locale: ${locale}, service: ${service.id}`);
   
   return (
-    <main className="pt-32 pb-20">
+    <main className="pt-32 pb-20 bg-white">
       <ServiceDetail service={service} locale={locale} />
     </main>
   );

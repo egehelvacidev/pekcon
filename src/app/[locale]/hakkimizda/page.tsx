@@ -38,7 +38,7 @@ export default function HakkimizdaPage({ params }: Props) {
   }
 
   return (
-    <main className="pt-40 pb-16">
+    <main className="pt-40 pb-16 bg-white">
       <Container>
         {/* Başlık Bölümü */}
         <div className="mb-12 text-center">
@@ -65,19 +65,12 @@ export default function HakkimizdaPage({ params }: Props) {
           <div className="order-1 md:order-2">
             <div className="relative h-96 rounded-lg overflow-hidden shadow-xl">
               <Image 
-                src="/images/hero/containergif.gif" 
+                src="https://s3.tebi.io/pekcon/containergif.gif" 
                 alt="PEKCON KONTEYNER" 
                 fill 
                 className="object-cover" 
                 sizes="(max-width: 768px) 100vw, 50vw"
                 priority
-                onError={(e) => {
-                  // Hata durumunda alternatif kaynağı kullan
-                  const target = e.target as HTMLImageElement;
-                  target.src = "https://lojistikcdn.vercel.app/images/hero/containergif.gif";
-                  // Veya yedek bir statik resim:
-                  // target.src = "/images/hero/container-static.jpg";
-                }}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-black/30"></div>
             </div>

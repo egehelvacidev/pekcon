@@ -55,8 +55,8 @@ export default function Hero({ locale }: HeroProps) {
           playsInline
           poster="/images/hero/video-thumbnail.jpg"
         >
-          <source src="/videos/herovideo.mp4" type="video/mp4" />
-          <source src="https://lojistikcdn.vercel.app/videos/herovideo.mp4" type="video/mp4" />
+          <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
+          <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
         </video>
         
         {/* Video üzerinde gradient overlay */}
