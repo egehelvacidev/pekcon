@@ -1,0 +1,91 @@
+{
+  "navigation": {
+    "home": "Ana Sayfa",
+    "about": "Hakkımızda",
+    "services": "Hizmetlerimiz",
+    "containerSales": "Konteynerlar",
+    "contact": "İletişim"
+  },
+  "footer": {
+    "copyright": "© 2024 PEKCON CONTAINER. Tüm Hakları Saklıdır.",
+    "navigation": "Site Haritası",
+    "contact": "İletişim Bilgileri",
+    "followUs": "Bizi Takip Edin"
+  },
+  "contact": {
+    "name": "Ad Soyad",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "subject": "Konu",
+    "message": "Mesajınız",
+    "send": "Gönder",
+    "required": "Bu alan zorunludur",
+    "invalidEmail": "Geçerli bir e-posta adresi giriniz",
+    "success": "Mesajınız başarıyla gönderildi",
+    "error": "Mesajınız gönderilemedi, lütfen tekrar deneyin",
+    "address": "Adres",
+    "phoneNumber": "Telefon Numarası",
+    "emailAddress": "E-posta Adresi",
+    "contactForm": "İletişim Formu",
+    "getInTouch": "Bizimle İletişime Geçin",
+    "location": "Konum"
+  },
+  "about": {
+    "companyOverview": "Şirket Hakkında",
+    "ourMission": "Misyonumuz",
+    "ourVision": "Vizyonumuz",
+    "ourValues": "Değerlerimiz",
+    "ourTeam": "Ekibimiz",
+    "joinOurTeam": "Ekibimize Katılın",
+    "history": "Tarihçemiz",
+    "achievements": "Başarılarımız",
+    "globalPresence": "Global Varlığımız",
+    "continentsServed": "Kıtada Hizmet",
+    "countryNetwork": "Ülke Ağı",
+    "agencyConnections": "Acenta Bağlantısı",
+    "successfulOperations": "Başarılı Operasyon",
+    "whyChooseUs": "Neden Bizi Tercih Etmelisiniz",
+    "reliability": "Güvenilirlik",
+    "quickSolutions": "Hızlı Çözümler",
+    "expertTeam": "Uzman Ekip",
+    "foundedIn": "2018 yılında kurulan",
+    "getInTouch": "Bize Ulaşın",
+    "contactUs": "İletişime Geçin"
+  },
+  "services": {
+    "seaFreight": "Denizyolu Taşımacılığı",
+    "roadFreight": "Karayolu Taşımacılığı",
+    "railFreight": "Demiryolu Taşımacılığı",
+    "airFreight": "Hava Kargo",
+    "projectCargo": "Proje Kargo",
+    "intermodal": "Intermodal Taşımacılık",
+    "learnMore": "Detaylı Bilgi",
+    "ourServices": "Hizmetlerimiz"
+  },
+  "containers": {
+    "type": "Konteyner Tipi",
+    "size": "Boyut",
+    "feature": "Özellik",
+    "condition": "Durum",
+    "all": "Tümü",
+    "new": "Sıfır",
+    "used": "İkinci El",
+    "details": "Detaylar",
+    "requestPrice": "Fiyat Talebi",
+    "technicalSpecs": "Teknik Özellikler",
+    "dimensions": "Boyutlar",
+    "capacity": "Kapasite",
+    "filters": "Filtreler",
+    "applyFilters": "Filtreleri Uygula",
+    "resetFilters": "Filtreleri Sıfırla",
+    "noContainersFound": "Seçtiğiniz kriterlere uygun konteyner bulunamadı"
+  },
+  "actions": {
+    "readMore": "Devamını Oku",
+    "contactUs": "İletişime Geçin",
+    "details": "Detaylar",
+    "goBack": "Geri Dön",
+    "sendMessage": "Mesaj Gönder",
+    "whatsapp": "WhatsApp ile İletişim"
+  }
+} 

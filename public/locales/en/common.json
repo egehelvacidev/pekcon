@@ -1,0 +1,91 @@
+{
+  "navigation": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "containerSales": "Containers",
+    "contact": "Contact"
+  },
+  "footer": {
+    "copyright": "© 2024 PEKCON CONTAINER. All Rights Reserved.",
+    "navigation": "Site Map",
+    "contact": "Contact Information",
+    "followUs": "Follow Us"
+  },
+  "contact": {
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "subject": "Subject",
+    "message": "Your Message",
+    "send": "Send",
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "success": "Your message has been sent successfully",
+    "error": "Failed to send your message, please try again",
+    "address": "Address",
+    "phoneNumber": "Phone Number",
+    "emailAddress": "Email Address",
+    "contactForm": "Contact Form",
+    "getInTouch": "Get In Touch",
+    "location": "Location"
+  },
+  "about": {
+    "companyOverview": "Company Overview",
+    "ourMission": "Our Mission",
+    "ourVision": "Our Vision",
+    "ourValues": "Our Values",
+    "ourTeam": "Our Team",
+    "joinOurTeam": "Join Our Team",
+    "history": "Our History",
+    "achievements": "Achievements",
+    "globalPresence": "Our Global Presence",
+    "continentsServed": "Continents Served",
+    "countryNetwork": "Country Network",
+    "agencyConnections": "Agency Connections",
+    "successfulOperations": "Successful Operations",
+    "whyChooseUs": "Why Choose Us",
+    "reliability": "Reliability",
+    "quickSolutions": "Quick Solutions",
+    "expertTeam": "Expert Team",
+    "foundedIn": "Founded in 2018",
+    "getInTouch": "Contact Us",
+    "contactUs": "Contact Us"
+  },
+  "services": {
+    "seaFreight": "Sea Freight",
+    "roadFreight": "Road Freight",
+    "railFreight": "Rail Freight",
+    "airFreight": "Air Freight",
+    "projectCargo": "Project Cargo",
+    "intermodal": "Intermodal Transport",
+    "learnMore": "Learn More",
+    "ourServices": "Our Services"
+  },
+  "containers": {
+    "type": "Container Type",
+    "size": "Size",
+    "feature": "Feature",
+    "condition": "Condition",
+    "all": "All",
+    "new": "New",
+    "used": "Used",
+    "details": "Details",
+    "requestPrice": "Request Price",
+    "technicalSpecs": "Technical Specifications",
+    "dimensions": "Dimensions",
+    "capacity": "Capacity",
+    "filters": "Filters",
+    "applyFilters": "Apply Filters",
+    "resetFilters": "Reset Filters",
+    "noContainersFound": "No containers found matching your criteria"
+  },
+  "actions": {
+    "readMore": "Read More",
+    "contactUs": "Contact Us",
+    "details": "Details",
+    "goBack": "Go Back",
+    "sendMessage": "Send Message",
+    "whatsapp": "Contact via WhatsApp"
+  }
+} 
