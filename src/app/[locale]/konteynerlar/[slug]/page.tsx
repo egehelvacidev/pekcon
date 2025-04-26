@@ -85,7 +85,7 @@ export default function ContainerDetails({ params }: { params: { slug: string, l
   const hasCapacity = containerSpecs && containerSpecs.capacity !== undefined;
   
   return (
-    <main className="pt-40 pb-20">
+    <main className="pt-40 pb-20 bg-white">
       <Container>
         <div className="mb-8">
           <Button

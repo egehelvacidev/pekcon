@@ -34,7 +34,7 @@ export default function ContainersPage({ params }: { params: { locale: Locale } 
   }
   
   return (
-    <main className="pt-32 pb-20">
+    <main className="pt-32 pb-20 bg-white">
       <div className="container mx-auto px-4">
         <div className="mb-12">
           <h1 className="text-3xl font-bold mb-6">Konteynerlar</h1>
