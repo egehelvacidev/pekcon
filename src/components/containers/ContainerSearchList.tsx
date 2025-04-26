@@ -95,7 +95,7 @@ export default function ContainerSearchList({ locale }: ContainerSearchListProps
   const [filteredContainers, setFilteredContainers] = useState(containerTypes);
   const [activeTab, setActiveTab] = useState('all');
   
-  // Arama ve filtreleme işlemi
+  // Filtre işlemi
   useEffect(() => {
     const filtered = containerTypes.filter(container => {
       // Arama filtresi
@@ -111,7 +111,7 @@ export default function ContainerSearchList({ locale }: ContainerSearchListProps
     });
     
     setFilteredContainers(filtered);
-  }, [searchText, selectedCategory, selectedSize]);
+  }, [searchText, selectedCategory, selectedSize, containerTypes]);
 
   // Kategoriye göre konteyner sayısını hesaplama
   const getCategoryCount = (category: string) => {

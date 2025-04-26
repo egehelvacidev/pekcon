@@ -8,13 +8,7 @@ import { Link } from '@/lib/i18n';
 import { Locale } from '@/lib/i18n';
 import { notFound } from 'next/navigation';
 
-type Props = {
-  params: {
-    locale: Locale;
-  };
-};
-
-export function generateMetadata({ params }: Props): Metadata {
+export function generateMetadata({ params }: { params: { locale: string } }): Metadata {
   return {
     title: params.locale === 'tr' ? 'Hakkımızda |  PEKCON Container&Logistics' : 'About Us | PEKCON Container&Logistics',
     description:
@@ -24,8 +18,8 @@ export function generateMetadata({ params }: Props): Metadata {
   };
 }
 
-export default function AboutUs({ params }: Props) {
-  const locale = params.locale;
+export default function AboutUs({ params }: { params: { locale: string } }) {
+  const locale = params.locale as Locale;
   const t = useTranslations('about');
   const actionT = useTranslations('actions');
   

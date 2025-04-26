@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { ReactNode } from 'react';
+import Image from 'next/image';
 
 interface CardProps {
   className?: string;
@@ -72,11 +73,11 @@ interface CardImageProps {
 function CardImage({ className, src, alt, width, height }: CardImageProps) {
   return (
     <div className={cn('relative w-full overflow-hidden', className)}>
-      <img
+      <Image
         src={src}
         alt={alt}
-        width={width}
-        height={height}
+        width={width || 500}
+        height={height || 300}
         className="w-full h-full object-cover"
       />
     </div>
