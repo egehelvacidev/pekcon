@@ -16,6 +16,7 @@ export default function Hero({ locale }: HeroProps) {
   const [isMobile, setIsMobile] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoAttempts, setVideoAttempts] = useState(0);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   // Pencere yüksekliğini ve genişliğini belirlemek için useEffect kullanımı
   useEffect(() => {
@@ -37,6 +38,11 @@ export default function Hero({ locale }: HeroProps) {
   useEffect(() => {
     const playVideo = async () => {
       if (videoRef.current) {
+        // Video yükleme olayını dinle
+        videoRef.current.onloadeddata = () => {
+          setVideoLoaded(true);
+        };
+
         try {
           // Video'yu gizli yükle ve hazırlandığında oynat
           videoRef.current.load();
@@ -107,16 +113,41 @@ export default function Hero({ locale }: HeroProps) {
     }
   };
 
+  // Tarayıcının video kontrollerini gizlemek için özel CSS sınıfı
+  const videoClass = `absolute inset-0 w-full h-full object-cover ${videoLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`;
+
   return (
     <div 
       className="relative flex items-center overflow-hidden"
       style={{ height: windowHeight, minHeight: '500px' }}
     >
       {/* Arkaplan video - mobil cihazlarda düşük kalitede veya statik görüntü kullanılabilir */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 video-container">
+        <style jsx>{`
+          .video-container video::-webkit-media-controls {
+            display: none !important;
+          }
+          .video-container video::-webkit-media-controls-start-playback-button {
+            display: none !important;
+          }
+          video::-webkit-media-controls-panel {
+            display: none !important;
+            opacity: 0 !important;
+          }
+          video::-webkit-media-controls-play-button {
+            display: none !important;
+            opacity: 0 !important;
+          }
+          video::-webkit-media-controls-overlay-play-button {
+            display: none !important;
+          }
+          video::-webkit-media-controls-enclosure {
+            display: none !important;
+          }
+        `}</style>
         <video
           ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover"
+          className={videoClass}
           autoPlay
           muted
           loop
@@ -126,6 +157,7 @@ export default function Hero({ locale }: HeroProps) {
           controls={false}
           disablePictureInPicture
           disableRemotePlayback
+          webkit-playsinline="true"
         >
           <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
           {/* Yedek kaynak kaldırıldı, tek kaynak kullanımı yeterli */}
