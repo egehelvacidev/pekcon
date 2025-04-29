@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "PEKCON Container & Logistics - Global Lojistik Çözümler",
   description: "PEKCON Container & Logistics, uluslararası taşımacılık ve konteyner tedariğinde güvenilir çözüm ortağınız.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3001"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://pekcon.com/tr"),
   icons: {
     icon: [
       { url: '/icons/pekcon-favicon.ico', sizes: 'any' },
