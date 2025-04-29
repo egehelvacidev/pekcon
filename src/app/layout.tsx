@@ -15,7 +15,29 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "PEKCON Container & Logistics - Global Lojistik Çözümler",
   description: "PEKCON Container & Logistics, uluslararası taşımacılık ve konteyner tedariğinde güvenilir çözüm ortağınız.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://pekcon.com/tr"),
+  metadataBase: new URL("https://pekcon.com"),
+  openGraph: {
+    title: "PEKCON Container & Logistics",
+    description: "Global Lojistik Çözümler & Konteyner Tedarik Hizmetleri",
+    url: "https://pekcon.com",
+    siteName: "PEKCON Container & Logistics",
+    locale: "tr_TR",
+    type: "website",
+    images: [
+      {
+        url: "https://pekcon.com/icons/pekcon-apple-icon.png",
+        width: 180,
+        height: 180,
+        alt: "PEKCON Container & Logistics"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PEKCON Container & Logistics",
+    description: "Global Lojistik Çözümler & Konteyner Tedarik Hizmetleri",
+    images: ["https://pekcon.com/icons/pekcon-apple-icon.png"]
+  },
   icons: {
     icon: [
       { url: '/icons/pekcon-favicon.ico', sizes: 'any' },
@@ -49,6 +71,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="color-scheme" content="light" />
+        <meta property="og:site_name" content="PEKCON Container & Logistics" />
+        <meta property="og:url" content="https://pekcon.com" />
+        <link rel="canonical" href="https://pekcon.com" />
         <link rel="icon" href="/icons/pekcon-favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/pekcon-apple-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/pekcon-32x32.png" />
