@@ -203,7 +203,7 @@ export default function Hero({ locale }: HeroProps) {
         
         {/* Arka plan gradient'i - video üzerinde tıklamayı engelleyen bir katman olarak da çalışır */}
         <div 
-          className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/50 to-black/60 video-focus-trap"
+          className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/65 to-black/75 video-focus-trap"
           onClick={(e) => e.stopPropagation()}
         ></div>
         
@@ -233,19 +233,22 @@ export default function Hero({ locale }: HeroProps) {
       
       <Container className="relative z-10 pt-16 md:pt-24">
         <div className="max-w-full md:max-w-2xl mx-auto md:mx-0 text-center md:text-left text-white">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 md:mb-8 
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 md:mb-8 
                         tracking-tight text-transparent bg-clip-text bg-gradient-to-r 
-                        from-white to-blue-200 animate-fade-in">
+                        from-white via-blue-100 to-white animate-fade-in drop-shadow-[0_4px_3px_rgba(0,0,0,0.5)]
+                        [text-shadow:_0_1px_5px_rgb(0_0_0_/_80%)] [filter:_drop-shadow(0_0_6px_rgba(255,255,255,0.3))]">
             {locale === 'tr' 
               ? 'Global Lojistik Çözümler' 
               : 'Global Logistics Solutions'}
-            <span className="block mt-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
+            <span className="block mt-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl 
+                          [text-shadow:_0_2px_6px_rgb(0_0_0_/_80%)]">
               {locale === 'tr' 
               ? '& Konteyner Tedarik Hizmetleri' 
               : '& Container Supply Services'}
             </span>
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl mb-8 md:mb-10 animate-fade-in-delay font-light px-4 md:px-0">
+          <p className="text-lg sm:text-xl md:text-2xl mb-8 md:mb-10 animate-fade-in-delay font-medium px-4 md:px-0 
+                      [text-shadow:_0_1px_3px_rgb(0_0_0_/_80%)] drop-shadow-[0_2px_2px_rgba(0,0,0,0.4)]">
             {locale === 'tr'
               ? 'PEKCON Container&Logistics, uluslararası taşımacılık ve konteyner tedariğinde güvenilir çözüm ortağınız.'
               : 'PEKCON Container&Logistics, your reliable partner in international transportation and container supply.'}
@@ -255,7 +258,7 @@ export default function Hero({ locale }: HeroProps) {
               <Button 
                 variant="primary" 
                 size="lg" 
-                className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105 transition-all duration-300 text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-full flex items-center justify-center gap-2 animate-pulse animation-duration-3000 w-full sm:w-auto"
+                className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white shadow-xl shadow-orange-500/40 hover:shadow-orange-500/60 hover:scale-105 transition-all duration-300 text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-full flex items-center justify-center gap-2 animate-pulse animation-duration-3000 w-full sm:w-auto font-bold"
               >
                 <FaShoppingCart className="text-lg" />
                 {locale === 'tr' ? 'Konteyner Satış' : 'Container Sales'}
@@ -265,7 +268,7 @@ export default function Hero({ locale }: HeroProps) {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="border-2 border-white text-white hover:bg-white/20 transition-all text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-full w-full sm:w-auto"
+                className="border-2 border-white text-white hover:bg-white/30 hover:border-white transition-all text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-full w-full sm:w-auto font-semibold shadow-md hover:shadow-lg [text-shadow:_0_1px_2px_rgb(0_0_0_/_60%)]"
               >
                 {locale === 'tr' ? 'Hizmetlerimiz' : 'Our Services'}
               </Button>
