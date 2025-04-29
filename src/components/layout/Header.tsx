@@ -163,7 +163,7 @@ export default function Header({ locale }: HeaderProps) {
           {/* Right Side - Language Switcher & Mobile Menu Toggle */}
           <div className="flex items-center space-x-2 sm:space-x-4">
             <div className={isTransparentHeader && !scrolled ? 'shadow-glow transition-all duration-300' : ''}>
-              <LanguageSwitcher locale={locale} />
+            <LanguageSwitcher locale={locale} />
             </div>
             
             <button

@@ -17,9 +17,7 @@ export default function Hero({ locale }: HeroProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState(false);
-  const [videoAttempts, setVideoAttempts] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Pencere yüksekliğini ve genişliğini belirlemek için useEffect kullanımı
@@ -42,133 +40,50 @@ export default function Hero({ locale }: HeroProps) {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  // Video otomatik oynatmayı zorlayan güçlü bir çözüm - sadece iOS olmayan cihazlarda
+  // Sadece iOS olmayan cihazlarda video otomatik oynatmayı dene
   useEffect(() => {
-    if (isIOS) {
-      // iOS'te video otomatik oynatma deneme yapmıyoruz
-      return;
-    }
+    if (isIOS || !videoRef.current) return;
     
-    let videoPlayTimer: any = null; 
-    let interactionTimer: any = null;
-    let videoPlayAttempts = 0;
-    const maxAttempts = 10;
-    
-    // Kullanıcı etkileşimi olduğunda video oynatmayı dene
-    const tryPlayVideo = () => {
-      if (videoRef.current && videoRef.current.paused) {
-        console.log('Video oynatma deneniyor...');
-        
-        // Mobil cihazlar için gerekli tüm ayarları yap
+    const attemptPlay = () => {
+      if (videoRef.current) {
         videoRef.current.muted = true;
         videoRef.current.playsInline = true;
-        videoRef.current.setAttribute('playsinline', '');
-        videoRef.current.setAttribute('webkit-playsinline', '');
-        videoRef.current.controls = false;
         
-        // Video oynatmayı dene
         videoRef.current.play()
           .then(() => {
-            console.log('Video başarıyla oynatılıyor');
             setVideoPlaying(true);
-            setVideoAttempts(0);
           })
           .catch((error) => {
             console.error('Video oynatma hatası:', error);
-            
-            // Eğer maksimum deneme sayısına ulaşılmadıysa tekrar dene
-            if (videoPlayAttempts < maxAttempts) {
-              videoPlayAttempts++;
-              console.log(`Deneme ${videoPlayAttempts}/${maxAttempts}`);
-              
-              // Farklı bir süre bekleyerek tekrar dene
-              clearTimeout(videoPlayTimer);
-              videoPlayTimer = setTimeout(tryPlayVideo, 300 * videoPlayAttempts);
-            }
           });
       }
     };
     
-    // Video yüklendiğinde çalışacak fonksiyon
-    const handleVideoLoaded = () => {
-      console.log('Video yüklendi');
-      setVideoLoaded(true);
-      tryPlayVideo();
-    };
+    // Video yüklendiğinde oynatmayı dene
+    videoRef.current.addEventListener('loadeddata', attemptPlay);
     
-    // Kullanıcı etkileşimi ile videoyu başlatma girişimi
+    // Kullanıcı etkileşimi olduğunda oynatmayı dene
+    const userEvents = ['touchstart', 'click', 'scroll'];
     const handleUserInteraction = () => {
-      console.log('Kullanıcı etkileşimi algılandı');
-      tryPlayVideo();
-    };
-    
-    // Video hazır olduğunda
-    if (videoRef.current) {
-      // Video başlatma öncesi hazırlık
-      videoRef.current.load();
-      videoRef.current.onloadeddata = handleVideoLoaded;
-      
-      // Video ilerleme olayı
-      videoRef.current.ontimeupdate = () => {
-        if (videoRef.current && videoRef.current.currentTime > 0 && !videoPlaying) {
-          console.log('Video ilerlemeye başladı');
-          setVideoPlaying(true);
-        }
-      };
-      
-      // Mobil cihazlar için ekstra ayarlar
-      videoRef.current.muted = true;
-      videoRef.current.setAttribute('playsinline', '');
-      videoRef.current.setAttribute('webkit-playsinline', '');
-      videoRef.current.controls = false;
-      
-      // Sayfa yüklendikten sonra düzenli aralıklarla oynatmayı dene
-      interactionTimer = setInterval(() => {
-        if (!videoPlaying && videoRef.current && videoRef.current.paused) {
-          tryPlayVideo();
-        } else if (videoPlaying) {
-          clearInterval(interactionTimer);
-        }
-      }, 1000);
-    }
-    
-    // Tüm olası kullanıcı etkileşimleri için olay dinleyicileri
-    const events = [
-      'touchstart', 'touchend', 'click', 'scroll', 'mousemove', 
-      'keydown', 'visibilitychange', 'focus', 'pointerdown', 'mousedown'
-    ];
-    
-    events.forEach(event => {
-      document.addEventListener(event, handleUserInteraction, { passive: true });
-    });
-    
-    // Video container tıklama olayı
-    const preventShowControls = (e: MouseEvent | TouchEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      tryPlayVideo();
-    };
-    
-    if (containerRef.current) {
-      containerRef.current.addEventListener('click', preventShowControls);
-      containerRef.current.addEventListener('touchstart', preventShowControls);
-    }
-    
-    // Temizleme işlemleri
-    return () => {
-      clearTimeout(videoPlayTimer);
-      clearInterval(interactionTimer);
-      
-      events.forEach(event => {
-        document.removeEventListener(event, handleUserInteraction);
-      });
-      
-      if (containerRef.current) {
-        containerRef.current.removeEventListener('click', preventShowControls);
-        containerRef.current.removeEventListener('touchstart', preventShowControls);
+      if (videoRef.current && videoRef.current.paused) {
+        attemptPlay();
       }
     };
-  }, [videoPlaying, isIOS]);
+    
+    userEvents.forEach(event => {
+      document.addEventListener(event, handleUserInteraction, { once: true });
+    });
+    
+    return () => {
+      if (videoRef.current) {
+        videoRef.current.removeEventListener('loadeddata', attemptPlay);
+      }
+      
+      userEvents.forEach(event => {
+        document.removeEventListener(event, handleUserInteraction);
+      });
+    };
+  }, [isIOS]);
 
   // Aşağı kaydırma fonksiyonu
   const scrollToNextSection = () => {
@@ -195,6 +110,7 @@ export default function Hero({ locale }: HeroProps) {
     if (videoRef.current) {
       videoRef.current.muted = true;
       videoRef.current.playsInline = true;
+      
       videoRef.current.play()
         .then(() => {
           setVideoPlaying(true);
@@ -205,6 +121,44 @@ export default function Hero({ locale }: HeroProps) {
     }
   };
 
+  // iOS cihazlarda otomatik oynatmayı dene
+  useEffect(() => {
+    if (!isIOS || !videoRef.current) return;
+    
+    const attemptPlay = async () => {
+      if (videoRef.current) {
+        try {
+          videoRef.current.muted = true;
+          videoRef.current.playsInline = true;
+          await videoRef.current.play();
+          setVideoPlaying(true);
+        } catch (error) {
+          console.error('iOS video otomatik oynatma hatası:', error);
+        }
+      }
+    };
+    
+    attemptPlay();
+    
+    // Kullanıcı etkileşimi olduğunda oynatmayı dene
+    const userEvents = ['touchstart', 'click', 'scroll'];
+    const handleUserInteraction = () => {
+      if (videoRef.current && videoRef.current.paused) {
+        attemptPlay();
+      }
+    };
+    
+    userEvents.forEach(event => {
+      document.addEventListener(event, handleUserInteraction, { once: true });
+    });
+    
+    return () => {
+      userEvents.forEach(event => {
+        document.removeEventListener(event, handleUserInteraction);
+      });
+    };
+  }, [isIOS]);
+
   return (
     <div 
       className="relative flex items-center overflow-hidden"
@@ -214,41 +168,6 @@ export default function Hero({ locale }: HeroProps) {
       <div className="absolute inset-0 video-container" ref={containerRef}>
         {/* Global CSS stil etiketi - video kontrollerini tüm tarayıcılarda gizlemek için */}
         <style jsx global>{`
-          /* Video kontrollerini her türlü tarayıcıda gizle */
-          video::-webkit-media-controls,
-          video::-webkit-media-controls-panel,
-          video::-webkit-media-controls-play-button,
-          video::-webkit-media-controls-overlay-play-button,
-          video::-webkit-media-controls-start-playback-button,
-          video::-webkit-media-controls-volume-slider-container,
-          video::-webkit-media-controls-volume-slider,
-          video::-webkit-media-controls-mute-button,
-          video::-webkit-media-controls-timeline,
-          video::-webkit-media-controls-fullscreen-button,
-          video::-webkit-media-controls-download-button,
-          video::-webkit-media-controls-enclosure,
-          video::-internal-media-controls-download-button,
-          video::-internal-media-controls-overflow-button {
-            display: none !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-            visibility: hidden !important;
-            width: 0 !important;
-            height: 0 !important;
-            position: absolute !important;
-          }
-          
-          /* Mobil cihazlarda zoom/focus sorununu önle */
-          .video-container {
-            pointer-events: none;
-          }
-          
-          /* Video tüm tarayıcılarda oynatılsın */
-          video[autoplay]:not([muted]) {
-            muted: true;
-          }
-          
-          /* Video stilini düzgün ayarla */
           .hero-video {
             object-fit: cover;
             width: 100%;
@@ -259,7 +178,7 @@ export default function Hero({ locale }: HeroProps) {
           }
         `}</style>
         
-        {/* Statik arka plan görseli */}
+        {/* Statik arka plan görseli - Her zaman görünür */}
         <div className="absolute inset-0 bg-cover bg-center z-10">
           <Image 
             src="/images/hero/video-thumbnail.jpg" 
@@ -271,63 +190,56 @@ export default function Hero({ locale }: HeroProps) {
           />
         </div>
         
-        {/* iOS dışı cihazlarda video göster */}
+        {/* iOS olmayan cihazlar için otomatik oynatılan video */}
         {!isIOS && (
           <video
             ref={videoRef}
-            className={`hero-video z-0 ${videoLoaded && videoPlaying ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
+            className="hero-video z-20"
             autoPlay
             playsInline
             muted
             loop
             preload="auto"
             poster="/images/hero/video-thumbnail.jpg"
-            controls={false}
-            style={{ pointerEvents: 'none' }}
-            disablePictureInPicture
-            disableRemotePlayback
           >
-            <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
+            <source src="/videos/herovideo.mp4" type="video/mp4" />
           </video>
         )}
         
-        {/* iOS için özel video oynatma butonu */}
-        {isIOS && !videoPlaying && (
-          <div 
-            className="absolute inset-0 flex items-center justify-center z-20 cursor-pointer"
-            onClick={handleIOSVideoPlay}
-          >
-            <div className="bg-black/30 rounded-full p-5 backdrop-blur-sm">
-              <FaPlay className="text-white text-4xl" />
-            </div>
-          </div>
-        )}
-        
-        {/* iOS için gizli video - Kullanıcı tıkladığında oynatılacak */}
+        {/* iOS için özel video çözümü */}
         {isIOS && (
-          <video
-            ref={videoRef}
-            className={`hero-video z-0 ${videoPlaying ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
-            playsInline
-            muted
-            loop
-            preload="auto"
-            poster="/images/hero/video-thumbnail.jpg"
-            controls={false}
-            style={{ 
-              pointerEvents: videoPlaying ? 'none' : 'auto',
-              opacity: videoPlaying ? 1 : 0
-            }}
-          >
-            <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
-          </video>
+          <>
+            <video
+              ref={videoRef}
+              className="hero-video z-20"
+              playsInline
+              muted
+              loop
+              preload="auto"
+              poster="/images/hero/video-thumbnail.jpg"
+            >
+              <source src="/videos/herovideo.mp4" type="video/mp4" />
+            </video>
+            
+            {/* iOS için play butonu - sadece video oynamıyorsa göster */}
+            {!videoPlaying && (
+              <div 
+                className="absolute inset-0 flex items-center justify-center z-30 cursor-pointer"
+                onClick={handleIOSVideoPlay}
+              >
+                <div className="bg-white/20 rounded-full p-4 backdrop-blur-sm">
+                  <FaPlay className="text-white text-3xl" />
+                </div>
+              </div>
+            )}
+          </>
         )}
         
         {/* Arka plan gradient'i */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/65 to-black/75 z-25"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/65 to-black/75 z-40"></div>
       </div>
       
-      <Container className="relative z-30 pt-16 md:pt-24">
+      <Container className="relative z-50 pt-16 md:pt-24">
         <div className="max-w-full md:max-w-2xl mx-auto md:mx-0 text-center md:text-left text-white">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 md:mb-8 
                         tracking-tight text-transparent bg-clip-text bg-gradient-to-r 
@@ -374,7 +286,7 @@ export default function Hero({ locale }: HeroProps) {
       </Container>
       
       {/* Alt yönlendirme oku - responsive tasarım */}
-      <div className="absolute bottom-6 sm:bottom-10 left-0 right-0 flex justify-center z-30">
+      <div className="absolute bottom-6 sm:bottom-10 left-0 right-0 flex justify-center z-50">
         <button 
           onClick={scrollToNextSection}
           aria-label={locale === 'tr' ? 'Aşağı kaydır' : 'Scroll down'}
