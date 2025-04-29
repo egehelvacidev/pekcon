@@ -17,6 +17,8 @@ export default function Hero({ locale }: HeroProps) {
   const [isMobile, setIsMobile] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
+  const [videoAttempts, setVideoAttempts] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Pencere yüksekliğini ve genişliğini belirlemek için useEffect kullanımı
@@ -35,28 +37,128 @@ export default function Hero({ locale }: HeroProps) {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  // Sadece masaüstü cihazlarda video oynatma için
+  // Video otomatik oynatmayı zorlayan güçlü bir çözüm
   useEffect(() => {
-    // Eğer mobil cihaz değilse videoyu başlat
-    if (!isMobile && videoRef.current) {
-      const startDesktopVideo = async () => {
-        try {
-          // Videoyu yükle
-          videoRef.current.load();
-          
-          // Video hazır olunca oynat
-          videoRef.current.onloadeddata = () => {
-            setVideoLoaded(true);
-            videoRef.current?.play().catch(e => console.log('Masaüstü video başlatma hatası:', e));
-          };
-        } catch (error) {
-          console.error('Video yükleme hatası:', error);
+    let videoPlayTimer: any = null; 
+    let interactionTimer: any = null;
+    let videoPlayAttempts = 0;
+    const maxAttempts = 10;
+    
+    // Kullanıcı etkileşimi olduğunda video oynatmayı dene
+    const tryPlayVideo = () => {
+      if (videoRef.current && videoRef.current.paused) {
+        console.log('Video oynatma deneniyor...');
+        
+        // Mobil cihazlar için gerekli tüm ayarları yap
+        videoRef.current.muted = true;
+        videoRef.current.playsInline = true;
+        videoRef.current.setAttribute('playsinline', '');
+        videoRef.current.setAttribute('webkit-playsinline', '');
+        videoRef.current.controls = false;
+        
+        // Video oynatmayı dene
+        videoRef.current.play()
+          .then(() => {
+            console.log('Video başarıyla oynatılıyor');
+            setVideoPlaying(true);
+            setVideoAttempts(0);
+          })
+          .catch((error) => {
+            console.error('Video oynatma hatası:', error);
+            
+            // Eğer maksimum deneme sayısına ulaşılmadıysa tekrar dene
+            if (videoPlayAttempts < maxAttempts) {
+              videoPlayAttempts++;
+              console.log(`Deneme ${videoPlayAttempts}/${maxAttempts}`);
+              
+              // Farklı bir süre bekleyerek tekrar dene
+              clearTimeout(videoPlayTimer);
+              videoPlayTimer = setTimeout(tryPlayVideo, 300 * videoPlayAttempts);
+            }
+          });
+      }
+    };
+    
+    // Video yüklendiğinde çalışacak fonksiyon
+    const handleVideoLoaded = () => {
+      console.log('Video yüklendi');
+      setVideoLoaded(true);
+      tryPlayVideo();
+    };
+    
+    // Kullanıcı etkileşimi ile videoyu başlatma girişimi
+    const handleUserInteraction = () => {
+      console.log('Kullanıcı etkileşimi algılandı');
+      tryPlayVideo();
+    };
+    
+    // Video hazır olduğunda
+    if (videoRef.current) {
+      // Video başlatma öncesi hazırlık
+      videoRef.current.load();
+      videoRef.current.onloadeddata = handleVideoLoaded;
+      
+      // Video ilerleme olayı
+      videoRef.current.ontimeupdate = () => {
+        if (videoRef.current && videoRef.current.currentTime > 0 && !videoPlaying) {
+          console.log('Video ilerlemeye başladı');
+          setVideoPlaying(true);
         }
       };
       
-      startDesktopVideo();
+      // Mobil cihazlar için ekstra ayarlar
+      videoRef.current.muted = true;
+      videoRef.current.setAttribute('playsinline', '');
+      videoRef.current.setAttribute('webkit-playsinline', '');
+      videoRef.current.controls = false;
+      
+      // Sayfa yüklendikten sonra düzenli aralıklarla oynatmayı dene
+      interactionTimer = setInterval(() => {
+        if (!videoPlaying && videoRef.current && videoRef.current.paused) {
+          tryPlayVideo();
+        } else if (videoPlaying) {
+          clearInterval(interactionTimer);
+        }
+      }, 1000);
     }
-  }, [isMobile]);
+    
+    // Tüm olası kullanıcı etkileşimleri için olay dinleyicileri
+    const events = [
+      'touchstart', 'touchend', 'click', 'scroll', 'mousemove', 
+      'keydown', 'visibilitychange', 'focus', 'pointerdown', 'mousedown'
+    ];
+    
+    events.forEach(event => {
+      document.addEventListener(event, handleUserInteraction, { passive: true });
+    });
+    
+    // Video container tıklama olayı
+    const preventShowControls = (e: MouseEvent | TouchEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      tryPlayVideo();
+    };
+    
+    if (containerRef.current) {
+      containerRef.current.addEventListener('click', preventShowControls);
+      containerRef.current.addEventListener('touchstart', preventShowControls);
+    }
+    
+    // Temizleme işlemleri
+    return () => {
+      clearTimeout(videoPlayTimer);
+      clearInterval(interactionTimer);
+      
+      events.forEach(event => {
+        document.removeEventListener(event, handleUserInteraction);
+      });
+      
+      if (containerRef.current) {
+        containerRef.current.removeEventListener('click', preventShowControls);
+        containerRef.current.removeEventListener('touchstart', preventShowControls);
+      }
+    };
+  }, [videoPlaying]);
 
   // Aşağı kaydırma fonksiyonu
   const scrollToNextSection = () => {
@@ -78,9 +180,6 @@ export default function Hero({ locale }: HeroProps) {
     }
   };
 
-  // Tarayıcının video kontrollerini gizlemek için özel CSS sınıfı
-  const videoClass = `absolute inset-0 w-full h-full object-cover ${videoLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`;
-
   return (
     <div 
       className="relative flex items-center overflow-hidden"
@@ -94,16 +193,49 @@ export default function Hero({ locale }: HeroProps) {
           video::-webkit-media-controls,
           video::-webkit-media-controls-panel,
           video::-webkit-media-controls-play-button,
-          video::-webkit-media-controls-overlay-play-button {
+          video::-webkit-media-controls-overlay-play-button,
+          video::-webkit-media-controls-start-playback-button,
+          video::-webkit-media-controls-volume-slider-container,
+          video::-webkit-media-controls-volume-slider,
+          video::-webkit-media-controls-mute-button,
+          video::-webkit-media-controls-timeline,
+          video::-webkit-media-controls-fullscreen-button,
+          video::-webkit-media-controls-download-button,
+          video::-webkit-media-controls-enclosure,
+          video::-internal-media-controls-download-button,
+          video::-internal-media-controls-overflow-button {
             display: none !important;
             opacity: 0 !important;
             pointer-events: none !important;
             visibility: hidden !important;
+            width: 0 !important;
+            height: 0 !important;
+            position: absolute !important;
+          }
+          
+          /* Mobil cihazlarda zoom/focus sorununu önle */
+          .video-container {
+            pointer-events: none;
+          }
+          
+          /* Video tüm tarayıcılarda oynatılsın */
+          video[autoplay]:not([muted]) {
+            muted: true;
+          }
+          
+          /* Video stilini düzgün ayarla */
+          .hero-video {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
           }
         `}</style>
         
-        {/* Statik arka plan görseli - mobil cihazlarda her zaman görünür */}
-        <div className="absolute inset-0 bg-cover bg-center z-10">
+        {/* Statik arka plan görseli - video yüklenene kadar görünür */}
+        <div className={`absolute inset-0 bg-cover bg-center z-10 transition-opacity duration-1000 ${videoPlaying ? 'opacity-0' : 'opacity-100'}`}>
           <Image 
             src="/images/hero/video-thumbnail.jpg" 
             alt="PEKCON Container & Logistics" 
@@ -114,22 +246,23 @@ export default function Hero({ locale }: HeroProps) {
           />
         </div>
         
-        {/* Sadece masaüstü cihazlarda video göster */}
-        {!isMobile && (
-          <video
-            ref={videoRef}
-            className={`${videoClass} z-0 hidden md:block`}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            poster="/images/hero/video-thumbnail.jpg"
-            controls={false}
-          >
-            <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
-          </video>
-        )}
+        {/* Optimized video element */}
+        <video
+          ref={videoRef}
+          className={`hero-video z-0 ${videoLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
+          autoPlay
+          playsInline
+          muted
+          loop
+          preload="auto"
+          poster="/images/hero/video-thumbnail.jpg"
+          controls={false}
+          style={{ pointerEvents: 'none' }}
+          disablePictureInPicture
+          disableRemotePlayback
+        >
+          <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
+        </video>
         
         {/* Arka plan gradient'i */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/65 to-black/75 z-20"></div>
