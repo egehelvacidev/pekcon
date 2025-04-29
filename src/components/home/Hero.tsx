@@ -6,6 +6,7 @@ import Container from '@/components/ui/Container';
 import Button from '@/components/ui/Button';
 import { useEffect, useState, useRef } from 'react';
 import { FaShoppingCart } from 'react-icons/fa';
+import Image from 'next/image';
 
 interface HeroProps {
   locale: Locale;
@@ -17,6 +18,7 @@ export default function Hero({ locale }: HeroProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoAttempts, setVideoAttempts] = useState(0);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Pencere yüksekliğini ve genişliğini belirlemek için useEffect kullanımı
@@ -37,58 +39,75 @@ export default function Hero({ locale }: HeroProps) {
 
   // Video oynatma işlemi için ayrı bir useEffect
   useEffect(() => {
-    const playVideo = async () => {
-      if (videoRef.current) {
-        // Video yükleme olayını dinle
-        videoRef.current.onloadeddata = () => {
-          setVideoLoaded(true);
-        };
-
-        try {
-          // Video'yu hazırla ve oynat
-          videoRef.current.muted = true; // Öncelikle sessiz olduğundan emin ol
-          videoRef.current.autoplay = true;
-          videoRef.current.load();
-          videoRef.current.play()
-            .then(() => console.log('Video başarıyla başlatıldı'))
-            .catch(error => {
-              console.log('Video otomatik oynatılamadı:', error);
-              
-              // Mobil cihazlarda ek girişim - birkaç kez deneme yap
-              if (isMobile && videoAttempts < 5) {
-                console.log(`Video oynatma girişimi ${videoAttempts + 1}`);
-                setVideoAttempts(prev => prev + 1);
-                
-                // Mobil tarayıcılarda kullanıcı etkileşimi gerektiren durumlar için
-                setTimeout(() => {
-                  if (videoRef.current) {
-                    // Video kontrollerini kapat ve tekrar oynatmayı dene
-                    videoRef.current.controls = false;
-                    videoRef.current.play().catch(e => 
-                      console.log('Yeniden deneme başarısız:', e)
-                    );
-                  }
-                }, 300 * videoAttempts); // Her denemede biraz daha bekle
-              }
-            });
-        } catch (error) {
-          console.log('Video başlatma hatası:', error);
-        }
-      }
-    };
-
-    playVideo();
-
-    // Kullanıcı etkileşimi sonrasında videoyu başlatmak için event listener ekle
+    // Her tür olası kullanıcı etkileşimini yakalayacak fonksiyon
     const handleUserInteraction = () => {
       if (videoRef.current && videoRef.current.paused) {
-        videoRef.current.controls = false; // Etkileşimden sonra kontrolleri kapat
-        videoRef.current.play().catch(e => console.log('Etkileşim sonrası başlatma başarısız:', e));
+        // Kullanıcı etkileşiminden sonra videoyu oynatmaya çalış
+        videoRef.current.muted = true; // Mobil tarayıcılar için mutlaka sessiz olmalı
+        videoRef.current.controls = false; // Kontrolleri gizle
+        videoRef.current.play()
+          .then(() => {
+            console.log('Video kullanıcı etkileşimi sonrası başlatıldı');
+            setVideoPlaying(true);
+          })
+          .catch(e => {
+            console.log('Etkileşim sonrası başlatma başarısız:', e);
+          });
       }
     };
 
-    // Videoyu başlatmak için tüm olası kullanıcı etkileşimlerini dinle
-    const events = ['touchstart', 'touchend', 'click', 'scroll', 'mousemove'];
+    // Video yüklenmesi tamamlandığında çalışacak işlev
+    const handleVideoLoaded = () => {
+      setVideoLoaded(true);
+      // Video hazır olduğunda otomatik başlatma denemesi
+      if (videoRef.current) {
+        videoRef.current.play()
+          .then(() => {
+            console.log('Video otomatik başlatma başarılı');
+            setVideoPlaying(true);
+          })
+          .catch(error => {
+            console.log('Video otomatik başlatma başarısız:', error);
+            
+            // Mobil tarayıcılar için alternatif başlatma stratejileri
+            if (isMobile) {
+              console.log('Mobil cihaz için alternatif başlatma stratejileri deneniyor');
+              
+              // Belirli aralıklarla birkaç deneme daha yap
+              const attempts = [300, 1000, 2000, 3000];
+              
+              attempts.forEach((delay, index) => {
+                setTimeout(() => {
+                  if (videoRef.current && videoRef.current.paused) {
+                    console.log(`Alternatif başlatma denemesi ${index + 1}`);
+                    videoRef.current.muted = true;
+                    videoRef.current.play().catch(e => 
+                      console.log(`Alternatif deneme ${index + 1} başarısız:`, e)
+                    );
+                  }
+                }, delay);
+              });
+            }
+          });
+      }
+    };
+
+    // Video hazır olduğunda otomatik başlat
+    if (videoRef.current) {
+      // Videoyu yükle ve hazır olduğunda bildirimi al
+      videoRef.current.load();
+      videoRef.current.onloadeddata = handleVideoLoaded;
+      
+      // timeupdate olayı videoyu izlemeye başladığımızda tetiklenir
+      videoRef.current.ontimeupdate = () => {
+        if (!videoPlaying && videoRef.current && videoRef.current.currentTime > 0) {
+          setVideoPlaying(true);
+        }
+      };
+    }
+
+    // Tüm olası kullanıcı etkileşimlerini dinleyelim
+    const events = ['touchstart', 'touchend', 'click', 'scroll', 'mousemove', 'keydown'];
     
     events.forEach(event => {
       document.addEventListener(event, handleUserInteraction, { once: true });
@@ -98,9 +117,7 @@ export default function Hero({ locale }: HeroProps) {
     const preventShowControls = (e: MouseEvent | TouchEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      if (videoRef.current && videoRef.current.paused) {
-        videoRef.current.play().catch(console.error);
-      }
+      handleUserInteraction();
       return false;
     };
 
@@ -109,6 +126,7 @@ export default function Hero({ locale }: HeroProps) {
       containerRef.current.addEventListener('touchstart', preventShowControls);
     }
 
+    // Temizleme işlemleri
     return () => {
       events.forEach(event => {
         document.removeEventListener(event, handleUserInteraction);
@@ -119,7 +137,7 @@ export default function Hero({ locale }: HeroProps) {
         containerRef.current.removeEventListener('touchstart', preventShowControls);
       }
     };
-  }, [isMobile, videoAttempts]);
+  }, [isMobile, videoAttempts, videoPlaying]);
 
   // Aşağı kaydırma fonksiyonu
   const scrollToNextSection = () => {
@@ -201,15 +219,27 @@ export default function Hero({ locale }: HeroProps) {
           }
         `}</style>
         
+        {/* Arka plan statik görseli - video başlatılana kadar veya başlatılamazsa gösterilir */}
+        <div className={`absolute inset-0 bg-cover bg-center z-10 transition-opacity duration-1000 ${videoPlaying ? 'opacity-0' : 'opacity-100'}`}>
+          <Image 
+            src="/images/hero/video-thumbnail.jpg" 
+            alt="PEKCON Container & Logistics" 
+            fill 
+            priority 
+            sizes="100vw"
+            style={{ objectFit: 'cover' }} 
+          />
+        </div>
+        
         {/* Arka plan gradient'i - video üzerinde tıklamayı engelleyen bir katman olarak da çalışır */}
         <div 
-          className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/65 to-black/75 video-focus-trap"
+          className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/65 to-black/75 video-focus-trap z-20"
           onClick={(e) => e.stopPropagation()}
         ></div>
         
         <video
           ref={videoRef}
-          className={videoClass}
+          className={`${videoClass} z-0`}
           autoPlay={true}
           muted={true}
           loop={true}
@@ -231,7 +261,7 @@ export default function Hero({ locale }: HeroProps) {
         </video>
       </div>
       
-      <Container className="relative z-10 pt-16 md:pt-24">
+      <Container className="relative z-30 pt-16 md:pt-24">
         <div className="max-w-full md:max-w-2xl mx-auto md:mx-0 text-center md:text-left text-white">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 md:mb-8 
                         tracking-tight text-transparent bg-clip-text bg-gradient-to-r 
@@ -278,7 +308,7 @@ export default function Hero({ locale }: HeroProps) {
       </Container>
       
       {/* Alt yönlendirme oku - responsive tasarım */}
-      <div className="absolute bottom-6 sm:bottom-10 left-0 right-0 flex justify-center">
+      <div className="absolute bottom-6 sm:bottom-10 left-0 right-0 flex justify-center z-30">
         <button 
           onClick={scrollToNextSection}
           aria-label={locale === 'tr' ? 'Aşağı kaydır' : 'Scroll down'}
