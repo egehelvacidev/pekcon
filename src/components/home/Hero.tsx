@@ -5,7 +5,7 @@ import { Locale } from '@/lib/i18n';
 import Container from '@/components/ui/Container';
 import Button from '@/components/ui/Button';
 import { useEffect, useState, useRef } from 'react';
-import { FaShoppingCart } from 'react-icons/fa';
+import { FaShoppingCart, FaPlay } from 'react-icons/fa';
 import Image from 'next/image';
 
 interface HeroProps {
@@ -15,6 +15,7 @@ interface HeroProps {
 export default function Hero({ locale }: HeroProps) {
   const [windowHeight, setWindowHeight] = useState('100vh');
   const [isMobile, setIsMobile] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState(false);
@@ -28,6 +29,10 @@ export default function Hero({ locale }: HeroProps) {
       setWindowHeight(`${window.innerHeight}px`);
       // Mobil cihaz kontrolü
       setIsMobile(window.innerWidth < 768);
+      
+      // iOS cihaz tespiti
+      const userAgent = window.navigator.userAgent.toLowerCase();
+      setIsIOS(/iphone|ipad|ipod|macintosh/.test(userAgent) && 'ontouchend' in document);
     };
     
     // İlk yükleme ve resize olayında boyutları güncelle
@@ -37,8 +42,13 @@ export default function Hero({ locale }: HeroProps) {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  // Video otomatik oynatmayı zorlayan güçlü bir çözüm
+  // Video otomatik oynatmayı zorlayan güçlü bir çözüm - sadece iOS olmayan cihazlarda
   useEffect(() => {
+    if (isIOS) {
+      // iOS'te video otomatik oynatma deneme yapmıyoruz
+      return;
+    }
+    
     let videoPlayTimer: any = null; 
     let interactionTimer: any = null;
     let videoPlayAttempts = 0;
@@ -158,7 +168,7 @@ export default function Hero({ locale }: HeroProps) {
         containerRef.current.removeEventListener('touchstart', preventShowControls);
       }
     };
-  }, [videoPlaying]);
+  }, [videoPlaying, isIOS]);
 
   // Aşağı kaydırma fonksiyonu
   const scrollToNextSection = () => {
@@ -177,6 +187,21 @@ export default function Hero({ locale }: HeroProps) {
         top: window.innerHeight - 80, // Header'ı görünür bırakmak için biraz üst kısım bırak
         behavior: 'smooth'
       });
+    }
+  };
+
+  // iOS cihazlarda video oynatma işlemi
+  const handleIOSVideoPlay = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = true;
+      videoRef.current.playsInline = true;
+      videoRef.current.play()
+        .then(() => {
+          setVideoPlaying(true);
+        })
+        .catch(error => {
+          console.error('iOS video oynatma hatası:', error);
+        });
     }
   };
 
@@ -234,8 +259,8 @@ export default function Hero({ locale }: HeroProps) {
           }
         `}</style>
         
-        {/* Statik arka plan görseli - video yüklenene kadar görünür */}
-        <div className={`absolute inset-0 bg-cover bg-center z-10 transition-opacity duration-1000 ${videoPlaying ? 'opacity-0' : 'opacity-100'}`}>
+        {/* Statik arka plan görseli */}
+        <div className="absolute inset-0 bg-cover bg-center z-10">
           <Image 
             src="/images/hero/video-thumbnail.jpg" 
             alt="PEKCON Container & Logistics" 
@@ -246,26 +271,60 @@ export default function Hero({ locale }: HeroProps) {
           />
         </div>
         
-        {/* Optimized video element */}
-        <video
-          ref={videoRef}
-          className={`hero-video z-0 ${videoLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
-          autoPlay
-          playsInline
-          muted
-          loop
-          preload="auto"
-          poster="/images/hero/video-thumbnail.jpg"
-          controls={false}
-          style={{ pointerEvents: 'none' }}
-          disablePictureInPicture
-          disableRemotePlayback
-        >
-          <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
-        </video>
+        {/* iOS dışı cihazlarda video göster */}
+        {!isIOS && (
+          <video
+            ref={videoRef}
+            className={`hero-video z-0 ${videoLoaded && videoPlaying ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
+            autoPlay
+            playsInline
+            muted
+            loop
+            preload="auto"
+            poster="/images/hero/video-thumbnail.jpg"
+            controls={false}
+            style={{ pointerEvents: 'none' }}
+            disablePictureInPicture
+            disableRemotePlayback
+          >
+            <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
+          </video>
+        )}
+        
+        {/* iOS için özel video oynatma butonu */}
+        {isIOS && !videoPlaying && (
+          <div 
+            className="absolute inset-0 flex items-center justify-center z-20 cursor-pointer"
+            onClick={handleIOSVideoPlay}
+          >
+            <div className="bg-black/30 rounded-full p-5 backdrop-blur-sm">
+              <FaPlay className="text-white text-4xl" />
+            </div>
+          </div>
+        )}
+        
+        {/* iOS için gizli video - Kullanıcı tıkladığında oynatılacak */}
+        {isIOS && (
+          <video
+            ref={videoRef}
+            className={`hero-video z-0 ${videoPlaying ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
+            playsInline
+            muted
+            loop
+            preload="auto"
+            poster="/images/hero/video-thumbnail.jpg"
+            controls={false}
+            style={{ 
+              pointerEvents: videoPlaying ? 'none' : 'auto',
+              opacity: videoPlaying ? 1 : 0
+            }}
+          >
+            <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
+          </video>
+        )}
         
         {/* Arka plan gradient'i */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/65 to-black/75 z-20"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/65 to-black/75 z-25"></div>
       </div>
       
       <Container className="relative z-30 pt-16 md:pt-24">
