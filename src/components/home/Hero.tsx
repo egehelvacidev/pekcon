@@ -17,6 +17,7 @@ export default function Hero({ locale }: HeroProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoAttempts, setVideoAttempts] = useState(0);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Pencere yüksekliğini ve genişliğini belirlemek için useEffect kullanımı
   useEffect(() => {
@@ -44,30 +45,34 @@ export default function Hero({ locale }: HeroProps) {
         };
 
         try {
-          // Video'yu gizli yükle ve hazırlandığında oynat
+          // Video'yu hazırla ve oynat
+          videoRef.current.muted = true; // Öncelikle sessiz olduğundan emin ol
+          videoRef.current.autoplay = true;
           videoRef.current.load();
-
-          // Video hazır olduğunda oynatma girişiminde bulun
-          await videoRef.current.play();
-          console.log('Video başarıyla başlatıldı');
-        } catch (error) {
-          console.log('Video otomatik oynatılamadı:', error);
-          
-          // Mobil cihazlarda ek girişim
-          if (isMobile && videoAttempts < 3) {
-            console.log(`Video oynatma girişimi ${videoAttempts + 1}`);
-            setVideoAttempts(prev => prev + 1);
-            
-            // Mobil tarayıcılarda kullanıcı etkileşimi gerektiren durumlar için
-            // Sayfa yüklendikten sonra bir süre bekleyip tekrar dene
-            setTimeout(() => {
-              if (videoRef.current) {
-                videoRef.current.play().catch(e => 
-                  console.log('Yeniden deneme başarısız:', e)
-                );
+          videoRef.current.play()
+            .then(() => console.log('Video başarıyla başlatıldı'))
+            .catch(error => {
+              console.log('Video otomatik oynatılamadı:', error);
+              
+              // Mobil cihazlarda ek girişim - birkaç kez deneme yap
+              if (isMobile && videoAttempts < 5) {
+                console.log(`Video oynatma girişimi ${videoAttempts + 1}`);
+                setVideoAttempts(prev => prev + 1);
+                
+                // Mobil tarayıcılarda kullanıcı etkileşimi gerektiren durumlar için
+                setTimeout(() => {
+                  if (videoRef.current) {
+                    // Video kontrollerini kapat ve tekrar oynatmayı dene
+                    videoRef.current.controls = false;
+                    videoRef.current.play().catch(e => 
+                      console.log('Yeniden deneme başarısız:', e)
+                    );
+                  }
+                }, 300 * videoAttempts); // Her denemede biraz daha bekle
               }
-            }, 1000);
-          }
+            });
+        } catch (error) {
+          console.log('Video başlatma hatası:', error);
         }
       }
     };
@@ -77,19 +82,42 @@ export default function Hero({ locale }: HeroProps) {
     // Kullanıcı etkileşimi sonrasında videoyu başlatmak için event listener ekle
     const handleUserInteraction = () => {
       if (videoRef.current && videoRef.current.paused) {
+        videoRef.current.controls = false; // Etkileşimden sonra kontrolleri kapat
         videoRef.current.play().catch(e => console.log('Etkileşim sonrası başlatma başarısız:', e));
       }
     };
 
-    // Dokunma, tıklama vb. olaylar için dinleyiciler ekle
-    document.addEventListener('touchstart', handleUserInteraction, { once: true });
-    document.addEventListener('click', handleUserInteraction, { once: true });
-    document.addEventListener('scroll', handleUserInteraction, { once: true });
+    // Videoyu başlatmak için tüm olası kullanıcı etkileşimlerini dinle
+    const events = ['touchstart', 'touchend', 'click', 'scroll', 'mousemove'];
+    
+    events.forEach(event => {
+      document.addEventListener(event, handleUserInteraction, { once: true });
+    });
+
+    // Video container tıklaması - video kontrollerini engellemek için
+    const preventShowControls = (e: MouseEvent | TouchEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (videoRef.current && videoRef.current.paused) {
+        videoRef.current.play().catch(console.error);
+      }
+      return false;
+    };
+
+    if (containerRef.current) {
+      containerRef.current.addEventListener('click', preventShowControls);
+      containerRef.current.addEventListener('touchstart', preventShowControls);
+    }
 
     return () => {
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('scroll', handleUserInteraction);
+      events.forEach(event => {
+        document.removeEventListener(event, handleUserInteraction);
+      });
+      
+      if (containerRef.current) {
+        containerRef.current.removeEventListener('click', preventShowControls);
+        containerRef.current.removeEventListener('touchstart', preventShowControls);
+      }
     };
   }, [isMobile, videoAttempts]);
 
@@ -122,49 +150,90 @@ export default function Hero({ locale }: HeroProps) {
       style={{ height: windowHeight, minHeight: '500px' }}
     >
       {/* Arkaplan video - mobil cihazlarda düşük kalitede veya statik görüntü kullanılabilir */}
-      <div className="absolute inset-0 video-container">
-        <style jsx>{`
-          .video-container video::-webkit-media-controls {
-            display: none !important;
-          }
-          .video-container video::-webkit-media-controls-start-playback-button {
-            display: none !important;
-          }
-          video::-webkit-media-controls-panel {
-            display: none !important;
-            opacity: 0 !important;
-          }
-          video::-webkit-media-controls-play-button {
-            display: none !important;
-            opacity: 0 !important;
-          }
-          video::-webkit-media-controls-overlay-play-button {
-            display: none !important;
-          }
+      <div className="absolute inset-0 video-container" ref={containerRef}>
+        {/* Global CSS stil etiketi - video kontrollerini tüm tarayıcılarda gizlemek için */}
+        <style jsx global>{`
+          /* Video kontrollerini her türlü tarayıcıda gizle */
+          video::-webkit-media-controls,
+          video::-webkit-media-controls-panel,
+          video::-webkit-media-controls-panel-container,
+          video::-webkit-media-controls-start-playback-button,
+          video::-webkit-media-controls-play-button,
+          video::-webkit-media-controls-overlay-play-button,
+          video::-webkit-media-controls-overlay-play-button-container,
+          video::-webkit-media-controls-volume-slider-container,
+          video::-webkit-media-controls-volume-slider,
+          video::-webkit-media-controls-mute-button,
+          video::-webkit-media-controls-timeline,
+          video::-webkit-media-controls-current-time-display,
+          video::-webkit-media-controls-time-remaining-display,
+          video::-webkit-media-controls-fullscreen-button,
+          video::-webkit-media-controls-toggle-closed-captions-button,
           video::-webkit-media-controls-enclosure {
             display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
+            width: 0 !important;
+            height: 0 !important;
+          }
+          
+          /* Firefox için */
+          video::-moz-range-thumb, 
+          video::-moz-range-track {
+            display: none !important;
+          }
+          
+          /* Mobil tarayıcılar için ek stil */
+          .video-container {
+            pointer-events: none;
+          }
+          
+          /* IE için */
+          video::-ms-track {
+            display: none !important;
+          }
+          
+          /* Zoom ve focus sorununu önle */
+          .video-focus-trap {
+            pointer-events: none;
+            user-select: none;
           }
         `}</style>
+        
+        {/* Arka plan gradient'i - video üzerinde tıklamayı engelleyen bir katman olarak da çalışır */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/50 to-black/60 video-focus-trap"
+          onClick={(e) => e.stopPropagation()}
+        ></div>
+        
         <video
           ref={videoRef}
           className={videoClass}
-          autoPlay
-          muted
-          loop
-          playsInline
+          autoPlay={true}
+          defaultMuted={true}
+          muted={true}
+          loop={true}
+          playsInline={true}
           preload="auto"
           poster="/images/hero/video-thumbnail.jpg"
           controls={false}
-          disablePictureInPicture
-          disableRemotePlayback
-          webkit-playsinline="true"
+          disablePictureInPicture={true}
+          disableRemotePlayback={true}
+          style={{
+            pointerEvents: 'none',
+            objectFit: 'cover',
+            width: '100%',
+            height: '100%'
+          }}
+          x-webkit-airplay="deny"
+          x5-video-player-type="h5-page"
+          x5-video-player-fullscreen="false"
+          x5-video-orientation="portrait"
+          controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"
         >
           <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
-          {/* Yedek kaynak kaldırıldı, tek kaynak kullanımı yeterli */}
         </video>
-        
-        {/* Video üzerinde gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/50 to-black/60" />
       </div>
       
       <Container className="relative z-10 pt-16 md:pt-24">
