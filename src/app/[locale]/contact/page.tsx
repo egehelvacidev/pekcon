@@ -138,10 +138,10 @@ export default function Contact({ params }: { params: { locale: Locale } }) {
                 </iframe>
               </div>
               
-              {/* Directions Button */}
+              {/* Get Directions Button */}
               <div className="mt-2 mb-2">
                 <a 
-                  href="https://www.google.com/maps/dir/?api=1&destination=41.0685418,29.0016467&destination_place_id=ChIJ0ZsrRGZlxRQRF-AFsSf5OTM" 
+                  href="https://www.google.com/maps/dir//Avni+Dilligil+Sk.+No:5+Gülbahar+34394+Şişli/İstanbul/@41.0685418,29.0016467,20z/data=!4m5!4m4!1m0!1m2!1m1!1s0x14cab656452b9bd1:0x1339f9f51b05e017" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"

@@ -21,18 +21,24 @@ export default function Header({ locale }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  // Mobil için karanlık arka planı kontrol edelim
+  const [isTransparentHeader, setIsTransparentHeader] = useState(true);
 
   // Scroll yönetimi
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
         setScrolled(true);
+        setIsTransparentHeader(false);
       } else {
         setScrolled(false);
+        setIsTransparentHeader(true);
       }
     };
 
     window.addEventListener('scroll', handleScroll);
+    // Sayfa ilk yüklendiğinde de kontrol et
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -61,7 +67,7 @@ export default function Header({ locale }: HeaderProps) {
     return () => {
       document.body.style.overflow = 'auto';
     };
-  }, [mobileMenuOpen]);
+  }, []);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -76,7 +82,7 @@ export default function Header({ locale }: HeaderProps) {
       <Container>
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className={`flex-shrink-0 ${scrolled ? '' : 'bg-white/10 backdrop-blur-sm'} px-10 sm:px-30 py-3 rounded-md`}>
+          <div className={`flex-shrink-0 ${scrolled ? 'bg-transparent' : isTransparentHeader ? 'bg-white/10 backdrop-blur-sm' : 'bg-transparent'} px-10 sm:px-30 py-3 rounded-md`}>
             <Link href="/">
               <Image
                 src="/images/logo/pekcon_logo_temp.png"
@@ -90,11 +96,15 @@ export default function Header({ locale }: HeaderProps) {
 
           {/* Center - Navigation */}
           <div className="hidden lg:flex flex-1 justify-center">
-            <nav className="flex items-center space-x-4 xl:space-x-8">
+            <nav className={`flex items-center space-x-4 xl:space-x-8 ${isTransparentHeader && !scrolled ? 'opacity-70 hover:opacity-100 transition-opacity' : ''}`}>
               <Link 
                 href="/" 
                 className={`font-medium text-sm xl:text-base px-2 xl:px-3 py-2 rounded-md transition-colors ${
-                  scrolled ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' : 'text-white hover:text-blue-200 hover:bg-white/10'
+                  scrolled 
+                    ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' 
+                    : isTransparentHeader 
+                      ? 'text-white hover:text-blue-200 hover:bg-white/10' 
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
                 }`}
               >
                 {t('home')}
@@ -102,7 +112,11 @@ export default function Header({ locale }: HeaderProps) {
               <Link 
                 href={locale === 'tr' ? "/hakkimizda" : "/about-us"} 
                 className={`font-medium text-sm xl:text-base px-2 xl:px-3 py-2 rounded-md transition-colors ${
-                  scrolled ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' : 'text-white hover:text-blue-200 hover:bg-white/10'
+                  scrolled 
+                    ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' 
+                    : isTransparentHeader 
+                      ? 'text-white hover:text-blue-200 hover:bg-white/10' 
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
                 }`}
               >
                 {t('about')}
@@ -110,7 +124,11 @@ export default function Header({ locale }: HeaderProps) {
               <Link 
                 href={locale === 'tr' ? "/hizmetlerimiz" : "/services"} 
                 className={`font-medium text-sm xl:text-base px-2 xl:px-3 py-2 rounded-md transition-colors ${
-                  scrolled ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' : 'text-white hover:text-blue-200 hover:bg-white/10'
+                  scrolled 
+                    ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' 
+                    : isTransparentHeader 
+                      ? 'text-white hover:text-blue-200 hover:bg-white/10' 
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
                 }`}
               >
                 {t('services')}
@@ -118,7 +136,11 @@ export default function Header({ locale }: HeaderProps) {
               <Link 
                 href="/konteynerlar" 
                 className={`font-medium text-sm xl:text-base px-2 xl:px-3 py-2 rounded-md transition-colors ${
-                  scrolled ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' : 'text-white hover:text-blue-200 hover:bg-white/10'
+                  scrolled 
+                    ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' 
+                    : isTransparentHeader 
+                      ? 'text-white hover:text-blue-200 hover:bg-white/10' 
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
                 }`}
               >
                 {t('containerSales')}
@@ -126,7 +148,11 @@ export default function Header({ locale }: HeaderProps) {
               <Link 
                 href={locale === 'tr' ? "/iletisim" : "/contact"} 
                 className={`font-medium text-sm xl:text-base px-2 xl:px-3 py-2 rounded-md transition-colors ${
-                  scrolled ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' : 'text-white hover:text-blue-200 hover:bg-white/10'
+                  scrolled 
+                    ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' 
+                    : isTransparentHeader 
+                      ? 'text-white hover:text-blue-200 hover:bg-white/10' 
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
                 }`}
               >
                 {t('contact')}
@@ -136,11 +162,16 @@ export default function Header({ locale }: HeaderProps) {
           
           {/* Right Side - Language Switcher & Mobile Menu Toggle */}
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <LanguageSwitcher locale={locale} />
+            <div className={isTransparentHeader && !scrolled ? 'shadow-glow transition-all duration-300' : ''}>
+              <LanguageSwitcher locale={locale} />
+            </div>
             
             <button
               type="button"
-              className="inline-flex lg:hidden items-center justify-center p-2 rounded-md touch-target"
+              className={`inline-flex lg:hidden items-center justify-center p-2 rounded-md touch-target
+                ${isTransparentHeader && !scrolled ? 'bg-white/30 backdrop-blur-sm hover:bg-white/50' : ''}
+                transition-colors duration-300
+              `}
               aria-controls="mobile-menu"
               aria-expanded={mobileMenuOpen}
               onClick={toggleMobileMenu}
@@ -248,30 +279,27 @@ export default function Header({ locale }: HeaderProps) {
                 <h3 className="text-lg font-semibold text-gray-700 mb-4">
                   {locale === 'tr' ? 'Hızlı İletişim' : 'Quick Contact'}
                 </h3>
+                
+                {/* İletişim */}
                 <div className="space-y-4">
                   <a 
                     href={`tel:${CONTACT_INFO.phone}`} 
-                    className="flex items-center gap-3 text-gray-700 hover:text-blue-600 py-2"
+                    className="flex items-center text-gray-600 hover:text-blue-600 transition-colors"
                   >
-                    <FaPhoneAlt className="text-blue-600" />
+                    <FaPhoneAlt className="mr-3 text-blue-500" />
                     <span>{CONTACT_INFO.phone}</span>
                   </a>
+                  
                   <a 
                     href={`mailto:${CONTACT_INFO.email}`} 
-                    className="flex items-center gap-3 text-gray-700 hover:text-blue-600 py-2"
+                    className="flex items-center text-gray-600 hover:text-blue-600 transition-colors"
                   >
-                    <FaEnvelope className="text-blue-600" />
+                    <FaEnvelope className="mr-3 text-blue-500" />
                     <span>{CONTACT_INFO.email}</span>
                   </a>
                 </div>
               </div>
             </nav>
-            
-            <div className="p-4 border-t">
-              <div className="flex justify-center">
-                <LanguageSwitcher locale={locale} />
-              </div>
-            </div>
           </div>
         </div>
       )}

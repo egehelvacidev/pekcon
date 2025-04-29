@@ -11,6 +11,23 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
+  const [isTransparentHeader, setIsTransparentHeader] = useState(true);
+
+  useEffect(() => {
+    // Scroll durumuna göre header stilini belirle
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsTransparentHeader(false);
+      } else {
+        setIsTransparentHeader(true);
+      }
+    };
+    
+    // Sayfa yüklendiğinde ve scroll olduğunda kontrol et
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
@@ -139,11 +156,15 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        className="flex items-center justify-center rounded-md bg-white/10 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+        className={`flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+          isTransparentHeader 
+          ? 'bg-white/30 backdrop-blur-sm text-white hover:bg-white/50 border border-white/50 shadow-lg' 
+          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        <span>{currentLocaleLabel}</span>
+        <span className="font-bold">{currentLocaleLabel}</span>
         <svg
           className={cn('ml-1 h-5 w-5 transition-transform', {
             'rotate-180': isOpen,
@@ -171,7 +192,8 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
                 className={cn(
                   'block w-full px-4 py-2 text-left text-sm hover:bg-gray-100',
                   {
-                    'bg-gray-100 font-medium': locale === l,
+                    'bg-gray-100 font-medium text-blue-600': locale === l,
+                    'text-gray-700': locale !== l
                   }
                 )}
               >

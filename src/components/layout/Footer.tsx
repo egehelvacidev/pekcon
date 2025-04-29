@@ -19,7 +19,7 @@ export default function Footer({ locale }: FooterProps) {
   return (
     <footer className="bg-gray-800 text-white pt-12 pb-6">
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           {/* Logo ve İletişim Bilgileri */}
           <div className="col-span-1 md:col-span-1">
             <div className="mb-6">
@@ -29,28 +29,28 @@ export default function Footer({ locale }: FooterProps) {
                     src="/images/logo/pekcon_logo_temp.png" 
                     alt="PEKCON KONTEYNER Logo" 
                     fill
-                    className="object-contain" 
+                    className="object-contain bg-white/10 p-1 rounded-md" 
                   />
                 </div>
               </Link>
             </div>
             
             <div className="space-y-3">
-              <div className="flex items-center text-gray-400">
-                <FaMapMarkerAlt className="mr-2 text-blue-400" />
-                <span>{CONTACT_INFO.address[locale]}</span>
+              <div className="flex items-center text-gray-300">
+                <FaMapMarkerAlt className="mr-2 text-blue-400 flex-shrink-0" />
+                <span className="text-sm sm:text-base">{CONTACT_INFO.address[locale]}</span>
               </div>
               
-              <div className="flex items-center text-gray-400">
-                <FaPhone className="mr-2 text-blue-400" />
-                <a href={`tel:${CONTACT_INFO.phone}`} className="hover:text-white transition-colors">
+              <div className="flex items-center text-gray-300">
+                <FaPhone className="mr-2 text-blue-400 flex-shrink-0" />
+                <a href={`tel:${CONTACT_INFO.phone}`} className="hover:text-white transition-colors text-sm sm:text-base">
                   {CONTACT_INFO.phone}
                 </a>
               </div>
               
-              <div className="flex items-center text-gray-400">
-                <FaEnvelope className="mr-2 text-blue-400" />
-                <a href={`mailto:${CONTACT_INFO.email}`} className="hover:text-white transition-colors">
+              <div className="flex items-center text-gray-300">
+                <FaEnvelope className="mr-2 text-blue-400 flex-shrink-0" />
+                <a href={`mailto:${CONTACT_INFO.email}`} className="hover:text-white transition-colors text-sm sm:text-base">
                   {CONTACT_INFO.email}
                 </a>
               </div>
@@ -59,30 +59,30 @@ export default function Footer({ locale }: FooterProps) {
 
           {/* Site Haritası */}
           <div className="col-span-1">
-            <h3 className="text-xl font-semibold mb-4">{t('navigation')}</h3>
+            <h3 className="text-lg md:text-xl font-semibold mb-4 text-white">{t('navigation')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
                   {navT('home')}
                 </Link>
               </li>
               <li>
-                <Link href={locale === 'tr' ? "/hakkimizda" : "/about-us"} className="text-gray-400 hover:text-white transition-colors">
+                <Link href={locale === 'tr' ? "/hakkimizda" : "/about-us"} className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
                   {navT('about')}
                 </Link>
               </li>
               <li>
-                <Link href="/hizmetlerimiz" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/hizmetlerimiz" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
                   {navT('services')}
                 </Link>
               </li>
               <li>
-                <Link href="/konteynerlar" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/konteynerlar" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
                   {navT('containerSales')}
                 </Link>
               </li>
               <li>
-                <Link href={locale === 'tr' ? "/iletisim" : "/contact"} className="text-gray-400 hover:text-white transition-colors">
+                <Link href={locale === 'tr' ? "/iletisim" : "/contact"} className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
                   {navT('contact')}
                 </Link>
               </li>
@@ -91,13 +91,13 @@ export default function Footer({ locale }: FooterProps) {
 
           {/* Hizmetler */}
           <div className="col-span-1">
-            <h3 className="text-xl font-semibold mb-4">{navT('services')}</h3>
+            <h3 className="text-lg md:text-xl font-semibold mb-4 text-white">{navT('services')}</h3>
             <ul className="space-y-2">
               {MENU_ITEMS.find(item => item.id === 'services')?.subMenu?.map(subItem => (
                 <li key={subItem.id}>
                   <Link 
                     href={subItem.href} 
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
                   >
                     {subItem.label[locale]}
                   </Link>
@@ -108,7 +108,7 @@ export default function Footer({ locale }: FooterProps) {
 
           {/* Sosyal Medya */}
           <div className="col-span-1">
-            <h3 className="text-xl font-semibold mb-4">{t('followUs')}</h3>
+            <h3 className="text-lg md:text-xl font-semibold mb-4 text-white">{t('followUs')}</h3>
             <div className="flex space-x-4 mb-6">
               {CONTACT_INFO.socialMedia.map(platform => (
                 <a 
@@ -145,7 +145,7 @@ export default function Footer({ locale }: FooterProps) {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-gray-700 pt-6 text-center text-sm text-gray-400">
+        <div className="border-t border-gray-700 pt-6 text-center text-sm text-gray-300">
           <p>{t('copyright')}</p>
         </div>
       </Container>

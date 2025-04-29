@@ -23,7 +23,7 @@ export default function ServicesOverview({ locale }: ServicesOverviewProps) {
   };
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section id="services-section" className="py-20 bg-gray-50">
       <Container>
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">{getServicesTitle()}</h2>

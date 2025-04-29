@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     ]
   },
   manifest: '/site.webmanifest',
+  themeColor: '#ffffff',
 };
 
 export default function RootLayout({
@@ -39,11 +40,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr">
+    <html lang="tr" className="light">
       <head>
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-        <meta http-equiv="Pragma" content="no-cache" />
-        <meta http-equiv="Expires" content="0" />
+        <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta httpEquiv="Pragma" content="no-cache" />
+        <meta httpEquiv="Expires" content="0" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="color-scheme" content="light" />
         <link rel="icon" href="/icons/pekcon-favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/pekcon-apple-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/pekcon-32x32.png" />
@@ -51,7 +56,7 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
         <script src="/favicon.js" defer></script>
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased light-theme`}>
         {children}
       </body>
     </html>

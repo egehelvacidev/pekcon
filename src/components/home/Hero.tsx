@@ -39,6 +39,26 @@ export default function Hero({ locale }: HeroProps) {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
+  // Aşağı kaydırma fonksiyonu
+  const scrollToNextSection = () => {
+    // Services section elementini bul
+    const servicesSection = document.getElementById('services-section');
+    
+    if (servicesSection) {
+      // Hizmetler bölümüne kaydır
+      servicesSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    } else {
+      // Eğer element bulunamazsa, ekran yüksekliği kadar kaydır
+      window.scrollTo({
+        top: window.innerHeight - 80, // Header'ı görünür bırakmak için biraz üst kısım bırak
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <div 
       className="relative flex items-center overflow-hidden"
@@ -66,8 +86,8 @@ export default function Hero({ locale }: HeroProps) {
       <Container className="relative z-10 pt-16 md:pt-24">
         <div className="max-w-full md:max-w-2xl mx-auto md:mx-0 text-center md:text-left text-white">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 md:mb-8 
-                         tracking-tight text-transparent bg-clip-text bg-gradient-to-r 
-                         from-white to-blue-200 animate-fade-in">
+                        tracking-tight text-transparent bg-clip-text bg-gradient-to-r 
+                        from-white to-blue-200 animate-fade-in">
             {locale === 'tr' 
               ? 'Global Lojistik Çözümler' 
               : 'Global Logistics Solutions'}
@@ -108,11 +128,15 @@ export default function Hero({ locale }: HeroProps) {
       
       {/* Alt yönlendirme oku - responsive tasarım */}
       <div className="absolute bottom-6 sm:bottom-10 left-0 right-0 flex justify-center">
-        <div className="animate-bounce cursor-pointer p-2 rounded-full bg-white/20 backdrop-blur-sm touch-target">
+        <button 
+          onClick={scrollToNextSection}
+          aria-label={locale === 'tr' ? 'Aşağı kaydır' : 'Scroll down'}
+          className="animate-bounce cursor-pointer p-2 rounded-full bg-white/20 backdrop-blur-sm touch-target transition-all hover:bg-white/40 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+        >
           <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
-        </div>
+        </button>
       </div>
     </div>
   );
