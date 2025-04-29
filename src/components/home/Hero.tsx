@@ -211,7 +211,6 @@ export default function Hero({ locale }: HeroProps) {
           ref={videoRef}
           className={videoClass}
           autoPlay={true}
-          defaultMuted={true}
           muted={true}
           loop={true}
           playsInline={true}
@@ -226,10 +225,6 @@ export default function Hero({ locale }: HeroProps) {
             width: '100%',
             height: '100%'
           }}
-          x-webkit-airplay="deny"
-          x5-video-player-type="h5-page"
-          x5-video-player-fullscreen="false"
-          x5-video-orientation="portrait"
           controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"
         >
           <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
