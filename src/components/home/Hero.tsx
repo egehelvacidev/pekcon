@@ -15,6 +15,7 @@ export default function Hero({ locale }: HeroProps) {
   const [windowHeight, setWindowHeight] = useState('100vh');
   const [isMobile, setIsMobile] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoAttempts, setVideoAttempts] = useState(0);
 
   // Pencere yüksekliğini ve genişliğini belirlemek için useEffect kullanımı
   useEffect(() => {
@@ -29,15 +30,62 @@ export default function Hero({ locale }: HeroProps) {
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
     
-    // Video otomatik olarak başlatılsın
-    if (videoRef.current) {
-      videoRef.current.play().catch(error => {
-        console.log('Video otomatik oynatılamadı:', error);
-      });
-    }
-    
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
+
+  // Video oynatma işlemi için ayrı bir useEffect
+  useEffect(() => {
+    const playVideo = async () => {
+      if (videoRef.current) {
+        try {
+          // Video'yu gizli yükle ve hazırlandığında oynat
+          videoRef.current.load();
+
+          // Video hazır olduğunda oynatma girişiminde bulun
+          await videoRef.current.play();
+          console.log('Video başarıyla başlatıldı');
+        } catch (error) {
+          console.log('Video otomatik oynatılamadı:', error);
+          
+          // Mobil cihazlarda ek girişim
+          if (isMobile && videoAttempts < 3) {
+            console.log(`Video oynatma girişimi ${videoAttempts + 1}`);
+            setVideoAttempts(prev => prev + 1);
+            
+            // Mobil tarayıcılarda kullanıcı etkileşimi gerektiren durumlar için
+            // Sayfa yüklendikten sonra bir süre bekleyip tekrar dene
+            setTimeout(() => {
+              if (videoRef.current) {
+                videoRef.current.play().catch(e => 
+                  console.log('Yeniden deneme başarısız:', e)
+                );
+              }
+            }, 1000);
+          }
+        }
+      }
+    };
+
+    playVideo();
+
+    // Kullanıcı etkileşimi sonrasında videoyu başlatmak için event listener ekle
+    const handleUserInteraction = () => {
+      if (videoRef.current && videoRef.current.paused) {
+        videoRef.current.play().catch(e => console.log('Etkileşim sonrası başlatma başarısız:', e));
+      }
+    };
+
+    // Dokunma, tıklama vb. olaylar için dinleyiciler ekle
+    document.addEventListener('touchstart', handleUserInteraction, { once: true });
+    document.addEventListener('click', handleUserInteraction, { once: true });
+    document.addEventListener('scroll', handleUserInteraction, { once: true });
+
+    return () => {
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('scroll', handleUserInteraction);
+    };
+  }, [isMobile, videoAttempts]);
 
   // Aşağı kaydırma fonksiyonu
   const scrollToNextSection = () => {
@@ -73,10 +121,14 @@ export default function Hero({ locale }: HeroProps) {
           muted
           loop
           playsInline
+          preload="auto"
           poster="/images/hero/video-thumbnail.jpg"
+          controls={false}
+          disablePictureInPicture
+          disableRemotePlayback
         >
           <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
-          <source src="https://s3.tebi.io/pekcon/%C4%B0simsiz%20video%20%E2%80%90%20Clipchamp%20ile%20yap%C4%B1ld%C4%B1%20%282%29.mp4" type="video/mp4" />
+          {/* Yedek kaynak kaldırıldı, tek kaynak kullanımı yeterli */}
         </video>
         
         {/* Video üzerinde gradient overlay */}
